@@ -18,6 +18,8 @@ import * as React from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
 import { isNilOrEmptyString } from 'services/helpers';
 import { exploreConnection } from 'components/Connections/Browser/GenericBrowser/apiHelpers';
+import capitalize from 'lodash/capitalize';
+import countBy from 'lodash/countBy';
 import debounce from 'lodash/debounce';
 import makeStyle from '@material-ui/core/styles/makeStyles';
 import { getCurrentNamespace } from 'services/NamespaceStore';
@@ -119,6 +121,8 @@ export function GenericBrowser({ selectedConnection }) {
     ? entities.filter((e) => e.name.toLocaleLowerCase().includes(lowerSearchString))
     : entities;
 
+  const entityCounts = countBy(filteredEntities, 'type');
+
   return (
     <React.Fragment>
       <div className={classes.topBar}>
@@ -129,6 +133,10 @@ export function GenericBrowser({ selectedConnection }) {
           />
         </div>
         <div className={classes.topBarSearch}>
+          {Object.keys(entityCounts)
+            .sort()
+            .map((k) => `${k}: ${entityCounts[k]}`)
+            .join(', ')}
           <SearchField onChange={handleSearchChange} value={searchStringDisplay} />
         </div>
       </div>
