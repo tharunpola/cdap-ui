@@ -135,7 +135,7 @@ export function GenericBrowser({ selectedConnection }) {
         <div className={classes.topBarSearch}>
           {Object.keys(entityCounts)
             .sort()
-            .map((k) => `${k}: ${entityCounts[k]}`)
+            .map((k) => `${capitalize(k)}: ${entityCounts[k]}`)
             .join(', ')}
           <SearchField onChange={handleSearchChange} value={searchStringDisplay} />
         </div>
