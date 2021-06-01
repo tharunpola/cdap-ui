@@ -48,6 +48,7 @@ class MyBatchPipelineConfigCtrl {
     this.customEngineConfig = {
       'pairs': HydratorPlusPlusHydratorService.convertMapToKeyValuePairs(this.store.getCustomConfigForDisplay())
     };
+    this.transformationPushdown = this.store.getTransformationPushdown();
 
     if (this.customEngineConfig.pairs.length === 0) {
       this.customEngineConfig.pairs.push({
@@ -71,9 +72,15 @@ class MyBatchPipelineConfigCtrl {
     this.onExecutorMemoryChange = this.onExecutorMemoryChange.bind(this);
     this.onToggleInstrumentationChange = this.onToggleInstrumentationChange.bind(this);
     this.onStageLoggingChange = this.onStageLoggingChange.bind(this);
+    this.onTransformationPushdownChange = this.onTransformationPushdownChange.bind(this);
     this.myPipelineApi = myPipelineApi;
     this.$state = $state;
     this.containsMacros = HydratorPlusPlusHydratorService.runtimeArgsContainsMacros(this.runtimeArguments);
+  }
+
+  onTransformationPushdownChange(newConfig) {
+    this.transformationPushdown = newConfig;
+    this.updatePipelineEditStatus();
   }
 
   onCustomEngineConfigChange(newCustomConfig) {
@@ -100,6 +107,7 @@ class MyBatchPipelineConfigCtrl {
     this.store.setDriverMemoryMB(this.driverResources.memoryMB);
     this.store.setMemoryMB(this.executorResources.memoryMB);
     this.store.setVirtualCores(this.executorResources.virtualCores);
+    this.store.setTransformationPushdown(this.transformationPushdown);
   }
 
   applyAndClose() {

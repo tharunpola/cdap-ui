@@ -52,6 +52,7 @@ class HydratorPlusPlusConfigStore {
     this.hydratorPlusPlusConfigDispatcher.register('onSetDriverMemoryMB', this.setDriverMemoryMB.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onSetClientVirtualCores', this.setClientVirtualCores.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onSetClientMemoryMB', this.setClientMemoryMB.bind(this));
+    this.hydratorPlusPlusConfigDispatcher.register('onSetTransformationPushdown', this.setTransformationPushdown.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onSaveAsDraft', this.saveAsDraft.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onInitialize', this.init.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onSchemaPropagationDownStream', this.propagateIOSchemas.bind(this));
@@ -270,6 +271,7 @@ class HydratorPlusPlusConfigStore {
       config.stageLoggingEnabled = this.getStageLogging();
       config.processTimingEnabled = this.getInstrumentation();
       config.numOfRecordsPreview = this.getNumRecordsPreview();
+      config.transformationPushdown = this.getTransformationPushdown();
     } else if (appType === this.GLOBALS.etlRealtime) {
       config.instances = this.getInstance();
     } else if (appType === this.GLOBALS.etlDataStreams) {
@@ -1053,6 +1055,13 @@ class HydratorPlusPlusConfigStore {
   }
   getServiceAccountPath() {
     return this.getState().config.serviceAccountPath;
+  }
+
+  getTransformationPushdown() {
+    return this.getState().config.transformationPushdown;
+  }
+  setTransformationPushdown(pdconfig) {
+    this.state.config.transformationPushdown = pdconfig;
   }
 
   saveAsDraft() {
