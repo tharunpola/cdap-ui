@@ -15,17 +15,19 @@
  */
 
 import * as React from 'react';
-import MuiAlert from '@material-ui/lab/Alert';
 import { isNilOrEmptyString } from 'services/helpers';
 import { exploreConnection } from 'components/Connections/Browser/GenericBrowser/apiHelpers';
 import debounce from 'lodash/debounce';
 import makeStyle from '@material-ui/core/styles/makeStyles';
+import T from 'i18n-react';
 import { getCurrentNamespace } from 'services/NamespaceStore';
 import { useLocation } from 'react-router-dom';
 import Breadcrumb from 'components/Connections/Browser/GenericBrowser/Breadcrumb';
 import SearchField from 'components/Connections/Browser/GenericBrowser/SearchField';
 import { BrowserTable } from 'components/Connections/Browser/GenericBrowser/BrowserTable';
 import If from 'components/If';
+import EmptyMessageContainer from 'components/EmptyMessageContainer';
+import ErrorBanner from 'components/ErrorBanner';
 
 const useStyle = makeStyle(() => {
   return {
@@ -112,12 +114,14 @@ export function GenericBrowser({ selectedConnection }) {
     }
   }, [loc]);
 
-  const isEmpty = !Array.isArray(entities) || (Array.isArray(entities) && !entities.length);
-
   const lowerSearchString = searchString.trim().toLocaleLowerCase();
   const filteredEntities = lowerSearchString.length
     ? entities.filter((e) => e.name.toLocaleLowerCase().includes(lowerSearchString))
     : entities;
+
+  const isEmpty =
+    !Array.isArray(filteredEntities) ||
+    (Array.isArray(filteredEntities) && !filteredEntities.length);
 
   return (
     <React.Fragment>
@@ -132,7 +136,7 @@ export function GenericBrowser({ selectedConnection }) {
           <SearchField onChange={handleSearchChange} value={searchStringDisplay} />
         </div>
       </div>
-      <If condition={!isEmpty && !error}>
+      <If condition={loading || (!isEmpty && !error)}>
         <BrowserTable
           entities={filteredEntities}
           selectedConnection={selectedConnection}
@@ -141,15 +145,30 @@ export function GenericBrowser({ selectedConnection }) {
           loading={loading}
         />
       </If>
-      <If condition={isEmpty && !error}>
-        <MuiAlert severity="info" className={classes.alert}>
-          No entities available
-        </MuiAlert>
+      <If condition={isEmpty && !error && !loading}>
+        <EmptyMessageContainer title="No entities available">
+          <ul>
+            <li>
+              <span className="link-text" onClick={clearSearchString}>
+                {T.translate(`features.EmptyMessageContainer.clearLabel`)}
+              </span>
+              <span>your search</span>
+            </li>
+            <li>
+              <span>Browse to another location</span>
+            </li>
+          </ul>
+        </EmptyMessageContainer>
       </If>
-      <If condition={error}>
-        <MuiAlert severity="error" className={classes.alert}>
-          {error}
-        </MuiAlert>
+      <If condition={error && !loading}>
+        <ErrorBanner error={error} />
+        <EmptyMessageContainer title={error}>
+          <ul>
+            <li>
+              <span>Browse to another location</span>
+            </li>
+          </ul>
+        </EmptyMessageContainer>
       </If>
     </React.Fragment>
   );
