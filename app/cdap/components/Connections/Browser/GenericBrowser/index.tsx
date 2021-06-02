@@ -45,6 +45,11 @@ const useStyle = makeStyle(() => {
       justifyContent: 'flex-end',
       marginRight: '8px',
     },
+    entityCount: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      margin: '0 10px',
+    },
     alert: {
       maxHeight: '4em',
     },
@@ -133,10 +138,12 @@ export function GenericBrowser({ selectedConnection }) {
           />
         </div>
         <div className={classes.topBarSearch}>
-          {Object.keys(entityCounts)
-            .sort()
-            .map((k) => `${capitalize(k)}: ${entityCounts[k]}`)
-            .join(', ')}
+          <div className={classes.entityCount}>
+            {Object.keys(entityCounts)
+              .sort()
+              .map((k) => `${capitalize(k)}: ${entityCounts[k]}`)
+              .join(', ')}
+          </div>
           <SearchField onChange={handleSearchChange} value={searchStringDisplay} />
         </div>
       </div>
