@@ -145,7 +145,7 @@ export function GenericBrowser({ selectedConnection }) {
           loading={loading}
         />
       </If>
-      <If condition={isEmpty && !error && !loading}>
+      <If condition={isEmpty && !loading}>
         <EmptyMessageContainer title="No entities available">
           <ul>
             <li>
@@ -162,13 +162,6 @@ export function GenericBrowser({ selectedConnection }) {
       </If>
       <If condition={error && !loading}>
         <ErrorBanner error={error} />
-        <EmptyMessageContainer title={error}>
-          <ul>
-            <li>
-              <span>Browse to another location</span>
-            </li>
-          </ul>
-        </EmptyMessageContainer>
       </If>
     </React.Fragment>
   );
