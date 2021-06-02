@@ -28,6 +28,9 @@ import Breadcrumb from 'components/Connections/Browser/GenericBrowser/Breadcrumb
 import SearchField from 'components/Connections/Browser/GenericBrowser/SearchField';
 import { BrowserTable } from 'components/Connections/Browser/GenericBrowser/BrowserTable';
 import If from 'components/If';
+import EntityCount from './EntityCount';
+
+const ENTITY_TRUNCATION_LIMIT = 1000;
 
 const useStyle = makeStyle(() => {
   return {
@@ -139,10 +142,13 @@ export function GenericBrowser({ selectedConnection }) {
         </div>
         <div className={classes.topBarSearch}>
           <div className={classes.entityCount}>
-            {Object.keys(entityCounts)
-              .sort()
-              .map((k) => `${capitalize(k)}: ${entityCounts[k]}`)
-              .join(', ')}
+            <EntityCount
+              entityCounts={entityCounts}
+              isFiltered={lowerSearchString.length}
+              isTruncated={entities.length === ENTITY_TRUNCATION_LIMIT}
+              totalUnfilteredCount={entities.length}
+              truncationLimit={ENTITY_TRUNCATION_LIMIT}
+            />
           </div>
           <SearchField onChange={handleSearchChange} value={searchStringDisplay} />
         </div>
