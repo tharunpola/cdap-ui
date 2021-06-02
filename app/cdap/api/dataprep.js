@@ -22,20 +22,24 @@ let dataSrc = DataSourceConfigurer.getInstance();
 const appPath = '/namespaces/system/apps/dataprep';
 const baseServicePath = `${appPath}/services/service`;
 const contextPath = `${baseServicePath}/methods/contexts/:context`;
+const contextPathV2 = `${baseServicePath}/methods/v2/contexts/:context`;
 const basepath = `${contextPath}/workspaces/:workspaceId`;
+const basepathV2 = `${contextPathV2}/workspaces/:workspaceId`;
 const connectionsPath = `${contextPath}/connections`;
 const connectionTypesPath = `${baseServicePath}/methods/connectionTypes`;
 const datamodelsPath = `${contextPath}/datamodels/schemas`;
 
 const MyDataPrepApi = {
+  createWorkspace: apiCreator(dataSrc, 'POST', 'REQUEST', `${contextPathV2}/workspaces`),
+
   delete: apiCreator(dataSrc, 'DELETE', 'REQUEST', basepath),
   execute: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepath}/execute`),
   summary: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepath}/summary`),
   getSchema: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepath}/schema`),
   getUsage: apiCreator(dataSrc, 'GET', 'REQUEST', `${contextPath}/usage`),
   getInfo: apiCreator(dataSrc, 'GET', 'REQUEST', `${baseServicePath}/methods/info`),
-  getWorkspace: apiCreator(dataSrc, 'GET', 'REQUEST', `${basepath}`),
-  getWorkspaceList: apiCreator(dataSrc, 'GET', 'REQUEST', `${contextPath}/workspaces`),
+  getWorkspace: apiCreator(dataSrc, 'GET', 'REQUEST', `${basepathV2}`),
+  getWorkspaceList: apiCreator(dataSrc, 'GET', 'REQUEST', `${contextPathV2}/workspaces`),
 
   // Wrangler Data Model
   attachDataModel: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepath}/datamodels`),
@@ -60,6 +64,10 @@ const MyDataPrepApi = {
   createApp: apiCreator(dataSrc, 'PUT', 'REQUEST', `${appPath}`),
   ping: apiCreator(dataSrc, 'GET', 'REQUEST', `${baseServicePath}/methods/health`),
 
+  /**
+   * TODO: While integrating with v2 wrangler specification API do not remove the browser APIs.
+   * We have to think through the upgrade path for older "browse" button in pipelines.
+   */
   // File System Browser
   explorer: apiCreator(dataSrc, 'GET', 'REQUEST', `${contextPath}/explorer/fs`),
   readFile: apiCreator(dataSrc, 'GET', 'REQUEST', `${contextPath}/explorer/fs/read`),

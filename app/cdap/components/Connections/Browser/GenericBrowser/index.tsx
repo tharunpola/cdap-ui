@@ -17,7 +17,10 @@
 import * as React from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
 import { isNilOrEmptyString } from 'services/helpers';
-import { exploreConnection } from 'components/Connections/Browser/GenericBrowser/apiHelpers';
+import {
+  exploreConnection,
+  createWorkspace,
+} from 'components/Connections/Browser/GenericBrowser/apiHelpers';
 import debounce from 'lodash/debounce';
 import makeStyle from '@material-ui/core/styles/makeStyles';
 import { getCurrentNamespace } from 'services/NamespaceStore';
@@ -26,6 +29,7 @@ import Breadcrumb from 'components/Connections/Browser/GenericBrowser/Breadcrumb
 import SearchField from 'components/Connections/Browser/GenericBrowser/SearchField';
 import { BrowserTable } from 'components/Connections/Browser/GenericBrowser/BrowserTable';
 import If from 'components/If';
+import { Redirect } from 'react-router';
 
 const useStyle = makeStyle(() => {
   return {
@@ -59,6 +63,7 @@ export function GenericBrowser({ selectedConnection }) {
   const [path, setPath] = React.useState(pathFromUrl);
   const [searchString, setSearchString] = React.useState('');
   const [searchStringDisplay, setSearchStringDisplay] = React.useState('');
+  const [workspaceId, setWorkspaceId] = React.useState(null);
   const classes = useStyle();
 
   const fetchEntities = async () => {
@@ -77,17 +82,26 @@ export function GenericBrowser({ selectedConnection }) {
       setLoading(false);
     }
   };
+
   const debouncedSetSearchString = debounce(setSearchString, 300);
+
   const handleSearchChange = (newSearchString) => {
     setSearchStringDisplay(newSearchString);
     debouncedSetSearchString(newSearchString);
   };
+
   const clearSearchString = () => {
     debouncedSetSearchString.cancel();
     setSearchStringDisplay('');
     setSearchString('');
   };
-  const onExplore = (entityName) => {
+
+  const onExplore = (entity) => {
+    const { name: entityName, canBrowse } = entity;
+    if (!canBrowse) {
+      setLoading(true);
+      return onCreateWorkspace(entity);
+    }
     if (path === '/') {
       setPath(`/${entityName}`);
     } else {
@@ -96,6 +110,19 @@ export function GenericBrowser({ selectedConnection }) {
     setLoading(true);
     clearSearchString();
   };
+
+  const onCreateWorkspace = async (entity) => {
+    try {
+      const wid = await createWorkspace({
+        entity,
+        connection: selectedConnection,
+      });
+      setWorkspaceId(wid);
+    } catch (e) {
+      setError(e && e.message ? e.message : e);
+    }
+  };
+
   React.useEffect(() => {
     if (isNilOrEmptyString(selectedConnection)) {
       return setLoading(false);
@@ -119,6 +146,9 @@ export function GenericBrowser({ selectedConnection }) {
     ? entities.filter((e) => e.name.toLocaleLowerCase().includes(lowerSearchString))
     : entities;
 
+  if (workspaceId) {
+    return <Redirect to={`/ns/${getCurrentNamespace()}/wrangler/${workspaceId}`} />;
+  }
   return (
     <React.Fragment>
       <div className={classes.topBar}>
@@ -132,20 +162,13 @@ export function GenericBrowser({ selectedConnection }) {
           <SearchField onChange={handleSearchChange} value={searchStringDisplay} />
         </div>
       </div>
-      <If condition={!isEmpty && !error}>
-        <BrowserTable
-          entities={filteredEntities}
-          selectedConnection={selectedConnection}
-          path={path}
-          onExplore={onExplore}
-          loading={loading}
-        />
-      </If>
-      <If condition={isEmpty && !error}>
-        <MuiAlert severity="info" className={classes.alert}>
-          No entities available
-        </MuiAlert>
-      </If>
+      <BrowserTable
+        entities={filteredEntities}
+        selectedConnection={selectedConnection}
+        path={path}
+        onExplore={onExplore}
+        loading={loading}
+      />
       <If condition={error}>
         <MuiAlert severity="error" className={classes.alert}>
           {error}

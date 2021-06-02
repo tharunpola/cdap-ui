@@ -15,6 +15,7 @@
  */
 
 import { ConnectionsApi } from 'api/connections';
+import DataprepApi from 'api/dataprep';
 import { getCurrentNamespace } from 'services/NamespaceStore';
 
 export function exploreConnection({ connectionid, path = '/' }) {
@@ -27,6 +28,24 @@ export function exploreConnection({ connectionid, path = '/' }) {
     {
       context: getCurrentNamespace(),
       connectionid,
+    },
+    body
+  ).toPromise();
+}
+
+export function createWorkspace({ entity, connection, limit = 1000 }) {
+  const { path, properties } = entity;
+  const body = {
+    connection,
+    sampleRequest: {
+      path,
+      properties,
+      limit: 1000,
+    },
+  };
+  return DataprepApi.createWorkspace(
+    {
+      context: getCurrentNamespace(),
     },
     body
   ).toPromise();
