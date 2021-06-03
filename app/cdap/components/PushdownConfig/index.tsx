@@ -14,14 +14,14 @@
  * the License.
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
-import PropTypes, { InferProps } from 'prop-types';
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import { getCurrentNamespace } from 'services/NamespaceStore';
 import { MyPipelineApi } from 'api/pipeline';
+import { fetchPluginWidget } from 'services/PluginUtilities';
 import ConfigurationGroup from 'components/ConfigurationGroup';
 import { objectQuery } from 'services/helpers';
-import { FormControlLabel, Switch } from '@material-ui/core';
 import ToggleSwitch from 'components/ToggleSwitch';
 import LoadingSVG from 'components/LoadingSVG';
 import VersionStore from 'services/VersionStore';
@@ -48,17 +48,35 @@ const useStyles = makeStyles({
   },
 });
 
+function defaultPushdown(version) {
+  return {
+    // TODO(lahwran): when more pushdown plugins are supported, will need to allow user to select which one to use and use its info here
+    plugin: {
+      name: 'BigQueryPushdownEngine',
+      label: 'BigQueryPushdown',
+      type: 'sqlengine',
+      artifact: {
+        name: 'google-cloud',
+        version,
+        scope: 'SYSTEM',
+      },
+      properties: {},
+    },
+  };
+}
+
 function fetchPluginInfo() {
   const version = VersionStore.getState().version;
+  const defaults = defaultPushdown(null);
   const pluginParams = {
     namespace: getCurrentNamespace(),
-    parentArtifact: 'cdap-data-pipeline', // cdap-data-pipeline
-    version, // $CDAP_VERSION
-    extension: 'sqlengine', // sqlengine
-    pluginName: 'BigQueryPushdownEngine', // BigQueryPushdownEngine
-    scope: 'SYSTEM', // SYSTEM // may change
-    artifactName: 'google-cloud', // google-cloud
-    artifactScope: 'SYSTEM', // SYSTEM
+    parentArtifact: 'cdap-data-pipeline',
+    version,
+    extension: defaults.plugin.type,
+    pluginName: defaults.plugin.name,
+    scope: 'SYSTEM',
+    artifactName: defaults.plugin.artifact.name,
+    artifactScope: defaults.plugin.artifact.scope,
     limit: 1,
     order: 'DESC',
   };
@@ -66,48 +84,6 @@ function fetchPluginInfo() {
   return MyPipelineApi.getPluginProperties(pluginParams).map(([res]) => {
     return res;
   });
-}
-
-// TODO: this is copied without modification from app/cdap/components/Replicator/utilities/index.ts
-// is there a shared place it can move instead?
-function fetchPluginWidget(artifactName, artifactVersion, artifactScope, pluginName, pluginType) {
-  const widgetKey = `widgets.${pluginName}-${pluginType}`;
-  const params = {
-    namespace: getCurrentNamespace(),
-    artifactName,
-    artifactVersion,
-    scope: artifactScope,
-    keys: widgetKey,
-  };
-
-  return MyPipelineApi.fetchWidgetJson(params).map((res) => {
-    if (!res || !res[widgetKey]) {
-      return {};
-    }
-
-    try {
-      const widgetContent = JSON.parse(res[widgetKey]);
-      return widgetContent;
-    } catch (parseError) {
-      throw new Error(parseError);
-    }
-  });
-}
-
-function defaultPushdown(version) {
-  return {
-    plugin: {
-      name: 'BigQueryPushdown', // FIXME: should there be an "Engine" on this?
-      label: 'BigQueryPushdown',
-      type: 'sqlengine',
-      artifact: {
-        name: 'google-cloud',
-        version,
-        scope: 'USER', // FIXME: where is this supposed to come from?
-      },
-      properties: {},
-    },
-  };
 }
 interface IPushdownConfig {
   enabled: boolean;
@@ -152,18 +128,19 @@ export default function PushdownConfig({ value, onValueChange }: IPushdownProps)
   useEffect(() => {
     fetchPluginInfo().subscribe(
       (res) => {
+        const defaults = defaultPushdown(res.artifact.version);
         fetchPluginWidget(
-          'google-cloud',
+          defaults.plugin.artifact.name,
           res.artifact.version,
           res.artifact.scope,
-          'BigQueryPushdown',
-          'sqlengine'
+          defaults.plugin.name,
+          defaults.plugin.type
         ).subscribe(
           (widget) => {
             if (plugin === null || plugin === undefined) {
               onValueChange({
                 enabled,
-                transformationPushdown: defaultPushdown(res.artifact.version),
+                transformationPushdown: defaults,
               });
             }
             setPluginInfo(res);
