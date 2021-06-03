@@ -33,7 +33,6 @@ import { ICreateState } from 'components/Replicator/Create';
 import { objectQuery, truncateNumber } from 'services/helpers';
 import { PluginType } from 'components/Replicator/constants';
 
-// /v3/namespaces/default/artifacts/google-cloud/versions/0.18.0-SNAPSHOT
 export function fetchPluginInfo(
   parentArtifact,
   artifactName,
@@ -43,13 +42,13 @@ export function fetchPluginInfo(
 ) {
   const pluginParams = {
     namespace: getCurrentNamespace(),
-    parentArtifact: parentArtifact.name, // cdap-data-pipeline
-    version: parentArtifact.version, // $CDAP_VERSION
-    extension: pluginType, // sqlengine
-    pluginName, // BigQueryPushdown
-    scope: parentArtifact.scope, // SYSTEM // may change
-    artifactName, // google-cloud
-    artifactScope, // SYSTEM
+    parentArtifact: parentArtifact.name,
+    version: parentArtifact.version,
+    extension: pluginType,
+    pluginName,
+    scope: parentArtifact.scope,
+    artifactName,
+    artifactScope,
     limit: 1,
     order: 'DESC',
   };
