@@ -208,8 +208,8 @@
       </div>
       <div class="configuration-step-content" id="pushdown-tab-content"
         ng-if="BatchPipelineConfigCtrl.activeTab === 'pushdown'" style="height: 100%; width: 100%; display: block;">
-        <pushdown-config value="BatchPipelineConfigCtrl.transformationPushdown"
-          on-value-change="BatchPipelineConfigCtrl.onTransformationPushdownChange"
+        <pushdown-config value="BatchPipelineConfigCtrl.pushdownConfig"
+          on-value-change="BatchPipelineConfigCtrl.onPushdownConfigChange"
           style="height: 100%; width: 100%; display: block;">
         </pushdown-config>
       </div>

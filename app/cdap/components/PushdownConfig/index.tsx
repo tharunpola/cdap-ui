@@ -21,6 +21,10 @@ import { getCurrentNamespace } from 'services/NamespaceStore';
 import { MyPipelineApi } from 'api/pipeline';
 import ConfigurationGroup from 'components/ConfigurationGroup';
 import { objectQuery } from 'services/helpers';
+import { FormControlLabel, Switch } from '@material-ui/core';
+import ToggleSwitch from 'components/ToggleSwitch';
+import LoadingSVG from 'components/LoadingSVG';
+import VersionStore from 'services/VersionStore';
 
 const useStyles = makeStyles({
   container: {
@@ -34,16 +38,22 @@ const useStyles = makeStyles({
     alignItems: 'stretch',
     justifyContent: 'stretch',
   },
+  toggleContainer: {
+    maxWidth: '25%',
+    paddingTop: '10px',
+    paddingBottom: '10px',
+  },
   inner: {
     overflowY: 'scroll',
   },
 });
 
 function fetchPluginInfo() {
+  const version = VersionStore.getState().version;
   const pluginParams = {
     namespace: getCurrentNamespace(),
     parentArtifact: 'cdap-data-pipeline', // cdap-data-pipeline
-    version: '6.5.0-SNAPSHOT', // $CDAP_VERSION
+    version, // $CDAP_VERSION
     extension: 'sqlengine', // sqlengine
     pluginName: 'BigQueryPushdownEngine', // BigQueryPushdownEngine
     scope: 'SYSTEM', // SYSTEM // may change
@@ -84,15 +94,41 @@ function fetchPluginWidget(artifactName, artifactVersion, artifactScope, pluginN
   });
 }
 
-export default function PushdownConfig({
-  value,
-  onValueChange,
-}: InferProps<typeof PushdownConfig.propTypes>) {
+function defaultPushdown(version) {
+  return {
+    plugin: {
+      name: 'BigQueryPushdown', // FIXME: should there be an "Engine" on this?
+      label: 'BigQueryPushdown',
+      type: 'sqlengine',
+      artifact: {
+        name: 'google-cloud',
+        version,
+        scope: 'USER', // FIXME: where is this supposed to come from?
+      },
+      properties: {},
+    },
+  };
+}
+interface IPushdownConfig {
+  enabled: boolean;
+  transformationPushdown: null | {
+    plugin: null | object;
+  };
+}
+
+interface IPushdownProps {
+  value: IPushdownConfig;
+  onValueChange: (value: IPushdownConfig) => void;
+}
+
+export default function PushdownConfig({ value, onValueChange }: IPushdownProps) {
   const [loading, setLoading] = useState(true);
   const [pluginInfo, setPluginInfo] = useState(null);
   const [pluginWidget, setPluginWidget] = useState(null);
   const pluginProperties = objectQuery(pluginInfo, 'properties') || {};
-  const plugin = objectQuery(value, 'plugin') || {};
+  const { enabled, transformationPushdown } = value;
+
+  const plugin = objectQuery(transformationPushdown, 'plugin');
   const valueProperties = objectQuery(plugin, 'properties') || {};
 
   const classes = useStyles();
@@ -106,7 +142,11 @@ export default function PushdownConfig({
         },
       },
     };
-    onValueChange(newTransformationPushdown);
+    onValueChange({ enabled, transformationPushdown: newTransformationPushdown });
+  };
+
+  const toggleEnabled = () => {
+    onValueChange({ enabled: !enabled, transformationPushdown });
   };
 
   useEffect(() => {
@@ -116,10 +156,16 @@ export default function PushdownConfig({
           'google-cloud',
           res.artifact.version,
           res.artifact.scope,
-          'BigQueryPushdownEngine',
+          'BigQueryPushdown',
           'sqlengine'
         ).subscribe(
           (widget) => {
+            if (plugin === null || plugin === undefined) {
+              onValueChange({
+                enabled,
+                transformationPushdown: defaultPushdown(res.artifact.version),
+              });
+            }
             setPluginInfo(res);
             setPluginWidget(widget);
           },
@@ -138,13 +184,22 @@ export default function PushdownConfig({
     );
     // pass etc
   }, []);
+
   if (loading) {
-    // TODO: is there a better loading-indicator pattern?
-    return <> Loading ... </>;
+    return <LoadingSVG />;
   }
+
   return (
     <div className={classes.container}>
       <div className={classes.inner}>
+        ELT Pushdown lets you push transformations to an SQL-compatible engine, enabling an ELT
+        pattern.
+        <div className="label-with-toggle row">
+          <span className="toggle-label col-xs-4">Enable ELT Pushdown</span>
+          <div className="col-xs-7 toggle-container">
+            <ToggleSwitch isOn={enabled} onToggle={toggleEnabled} />
+          </div>
+        </div>
         <ConfigurationGroup
           widgetJson={pluginWidget}
           pluginProperties={pluginProperties}

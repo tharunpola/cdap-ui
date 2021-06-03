@@ -82,9 +82,6 @@ class HydratorPlusPlusConfigActions {
   setMaxConcurrentRuns(num) {
     this.dispatcher.dispatch('onSetMaxConcurrentRuns', num);
   }
-  setTransformationPushdown(pdconfig) {
-    this.dispatcher.dispatch('onSetTransformationPushdown', pdconfig);
-  }
   publishPipeline() {
     this.dispatcher.dispatch('onPublishPipeline');
   }

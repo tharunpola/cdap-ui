@@ -48,7 +48,7 @@ class MyBatchPipelineConfigCtrl {
     this.customEngineConfig = {
       'pairs': HydratorPlusPlusHydratorService.convertMapToKeyValuePairs(this.store.getCustomConfigForDisplay())
     };
-    this.transformationPushdown = this.store.getTransformationPushdown();
+    this.pushdownConfig = this.store.getPushdownConfig();
 
     if (this.customEngineConfig.pairs.length === 0) {
       this.customEngineConfig.pairs.push({
@@ -72,14 +72,14 @@ class MyBatchPipelineConfigCtrl {
     this.onExecutorMemoryChange = this.onExecutorMemoryChange.bind(this);
     this.onToggleInstrumentationChange = this.onToggleInstrumentationChange.bind(this);
     this.onStageLoggingChange = this.onStageLoggingChange.bind(this);
-    this.onTransformationPushdownChange = this.onTransformationPushdownChange.bind(this);
+    this.onPushdownConfigChange = this.onPushdownConfigChange.bind(this);
     this.myPipelineApi = myPipelineApi;
     this.$state = $state;
     this.containsMacros = HydratorPlusPlusHydratorService.runtimeArgsContainsMacros(this.runtimeArguments);
   }
 
-  onTransformationPushdownChange(newConfig) {
-    this.transformationPushdown = newConfig;
+  onPushdownConfigChange(newConfig) {
+    this.pushdownConfig = newConfig;
     this.updatePipelineEditStatus();
   }
 
@@ -107,7 +107,7 @@ class MyBatchPipelineConfigCtrl {
     this.store.setDriverMemoryMB(this.driverResources.memoryMB);
     this.store.setMemoryMB(this.executorResources.memoryMB);
     this.store.setVirtualCores(this.executorResources.virtualCores);
-    this.store.setTransformationPushdown(this.transformationPushdown);
+    this.store.setPushdownConfig(this.pushdownConfig);
   }
 
   applyAndClose() {
@@ -189,6 +189,7 @@ class MyBatchPipelineConfigCtrl {
     let isDriverResourceModidified = !isResourcesEqual(oldConfig.config.driverResources, updatedConfig.config.driverResources);
     let isProcessTimingModified = oldConfig.config.processTimingEnabled !== updatedConfig.config.processTimingEnabled;
     let isCustomEngineConfigModified = oldConfig.config.properties !== updatedConfig.config.properties;
+    let isTPDModified = !angular.equals(oldConfig.config.transformationPushdown, updatedConfig.config.transformationPushdown);
 
     // Pipeline update is only necessary in Detail view (i.e. after pipeline has been deployed)
     this.enablePipelineUpdate = this.isDeployed && (
@@ -196,7 +197,8 @@ class MyBatchPipelineConfigCtrl {
       isResourceModified ||
       isDriverResourceModidified ||
       isProcessTimingModified ||
-      isCustomEngineConfigModified
+      isCustomEngineConfigModified ||
+      isTPDModified
     );
   }
   getUpdatedPipelineConfig() {
@@ -209,6 +211,7 @@ class MyBatchPipelineConfigCtrl {
     pipelineconfig.config.driverResources = this.driverResources;
     pipelineconfig.config.stageLoggingEnabled = this.stageLogging;
     pipelineconfig.config.processTimingEnabled = this.instrumentation;
+    pipelineconfig.config.transformationPushdown = this.pushdownConfig.enabled ? this.pushdownConfig.transformationPushdown : null;
 
     // Have to do this, because unlike others we aren't actually directly modifying pipelineconfig.config.properties
     this.store.setCustomConfig(this.HydratorPlusPlusHydratorService.convertKeyValuePairsToMap(this.customEngineConfig));

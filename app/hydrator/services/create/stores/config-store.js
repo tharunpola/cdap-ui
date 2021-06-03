@@ -52,7 +52,6 @@ class HydratorPlusPlusConfigStore {
     this.hydratorPlusPlusConfigDispatcher.register('onSetDriverMemoryMB', this.setDriverMemoryMB.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onSetClientVirtualCores', this.setClientVirtualCores.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onSetClientMemoryMB', this.setClientMemoryMB.bind(this));
-    this.hydratorPlusPlusConfigDispatcher.register('onSetTransformationPushdown', this.setTransformationPushdown.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onSaveAsDraft', this.saveAsDraft.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onInitialize', this.init.bind(this));
     this.hydratorPlusPlusConfigDispatcher.register('onSchemaPropagationDownStream', this.propagateIOSchemas.bind(this));
@@ -73,7 +72,7 @@ class HydratorPlusPlusConfigStore {
   emitChange() {
     this.changeListeners.forEach( callback => callback() );
   }
-  setDefaults(config) {
+  setDefaults(defaultState) {
     this.state = {
       artifact: {
         name: '',
@@ -89,8 +88,8 @@ class HydratorPlusPlusConfigStore {
     Object.assign(this.state, { config: this.getDefaultConfig() });
 
     // This will be eventually used when we just pass on a config to the store to draw the dag.
-    if (config) {
-      angular.extend(this.state, config);
+    if (defaultState) {
+      angular.extend(this.state, defaultState);
       this.setComments(this.state.config.comments);
       this.setArtifact(this.state.artifact);
       this.setProperties(this.state.config.properties);
@@ -112,6 +111,13 @@ class HydratorPlusPlusConfigStore {
         this.setNumRecordsPreview(this.state.config.numOfRecordsPreview);
         this.setMaxConcurrentRuns(this.state.config.maxConcurrentRuns);
       }
+      this.setPushdownConfig({
+        // null: getDefaultConfig, undefined: imported json, {}: just in case
+        enabled: (this.state.config.transformationPushdown !== null
+          && this.state.config.transformationPushdown !== undefined
+          && !angular.equals(this.state.config.transformationPushdown, {})),
+        transformationPushdown: this.state.config.transformationPushdown
+      })
     }
     this.__defaultState = angular.copy(this.state);
   }
@@ -131,6 +137,8 @@ class HydratorPlusPlusConfigStore {
       properties: {},
       processTimingEnabled: true,
       stageLoggingEnabled: this.HYDRATOR_DEFAULT_VALUES.stageLoggingEnabled,
+      pushdownEnabled: false,
+      transformationPushdown: null,
     };
   }
 
@@ -271,7 +279,10 @@ class HydratorPlusPlusConfigStore {
       config.stageLoggingEnabled = this.getStageLogging();
       config.processTimingEnabled = this.getInstrumentation();
       config.numOfRecordsPreview = this.getNumRecordsPreview();
-      config.transformationPushdown = this.getTransformationPushdown();
+      const { enabled, transformationPushdown } = this.getPushdownConfig();
+      if (enabled) {
+        config.transformationPushdown = transformationPushdown;
+      }
     } else if (appType === this.GLOBALS.etlRealtime) {
       config.instances = this.getInstance();
     } else if (appType === this.GLOBALS.etlDataStreams) {
@@ -1057,11 +1068,16 @@ class HydratorPlusPlusConfigStore {
     return this.getState().config.serviceAccountPath;
   }
 
-  getTransformationPushdown() {
-    return this.getState().config.transformationPushdown;
+  getPushdownConfig() {
+    const config = this.getState().config;
+    return {
+      enabled: config.pushdownEnabled,
+      transformationPushdown: config.transformationPushdown,
+    };
   }
-  setTransformationPushdown(pdconfig) {
-    this.state.config.transformationPushdown = pdconfig;
+  setPushdownConfig({ enabled, transformationPushdown }) {
+    this.state.config.pushdownEnabled = enabled;
+    this.state.config.transformationPushdown = transformationPushdown;
   }
 
   saveAsDraft() {
