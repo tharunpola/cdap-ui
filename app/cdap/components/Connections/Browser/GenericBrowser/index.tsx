@@ -18,7 +18,6 @@ import * as React from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
 import { isNilOrEmptyString } from 'services/helpers';
 import { exploreConnection } from 'components/Connections/Browser/GenericBrowser/apiHelpers';
-import capitalize from 'lodash/capitalize';
 import countBy from 'lodash/countBy';
 import debounce from 'lodash/debounce';
 import makeStyle from '@material-ui/core/styles/makeStyles';
@@ -64,6 +63,7 @@ export function GenericBrowser({ selectedConnection }) {
   const queryParams = new URLSearchParams(loc.search);
   const pathFromUrl = queryParams.get('path') || '/';
   const [entities, setEntities] = React.useState([]);
+  const [totalCount, setTotalCount] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [path, setPath] = React.useState(pathFromUrl);
@@ -80,6 +80,7 @@ export function GenericBrowser({ selectedConnection }) {
       });
 
       setEntities(res.entities);
+      setTotalCount(res.totalCount);
       setError(null);
     } catch (e) {
       setError(`Failed to explore connection : "${e.response}"`);
@@ -145,9 +146,9 @@ export function GenericBrowser({ selectedConnection }) {
             <EntityCount
               entityCounts={entityCounts}
               isFiltered={lowerSearchString.length}
-              isTruncated={entities.length === ENTITY_TRUNCATION_LIMIT}
+              isTruncated={entities.length < totalCount}
               totalUnfilteredCount={entities.length}
-              truncationLimit={ENTITY_TRUNCATION_LIMIT}
+              truncationLimit={entities.length}
             />
           </div>
           <SearchField onChange={handleSearchChange} value={searchStringDisplay} />

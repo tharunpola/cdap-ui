@@ -46,10 +46,10 @@ export default function EntityCount({
         .sort()
         .map((k) => `${capitalize(k)}: ${entityCounts[k]}`)
         .join(', ')
-    : '0 entities';
+    : '0';
 
   const fullString = isFiltered
-    ? `${entityCountString} shown of ${totalUnfilteredCount} total entities`
+    ? `${entityCountString} shown of ${totalUnfilteredCount} total`
     : entityCountString;
 
   return (
