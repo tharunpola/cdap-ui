@@ -34,12 +34,12 @@ export function exploreConnection({ connectionid, path = '/' }) {
 }
 
 export function createWorkspace({ entity, connection, limit = 1000 }) {
-  const { path, properties } = entity;
+  const { path } = entity;
   const body = {
     connection,
     sampleRequest: {
       path,
-      properties,
+      properties: {},
       limit: 1000,
     },
   };

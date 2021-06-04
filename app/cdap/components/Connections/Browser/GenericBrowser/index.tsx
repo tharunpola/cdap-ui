@@ -133,7 +133,7 @@ export function GenericBrowser({ selectedConnection }) {
   React.useEffect(() => {
     const query = new URLSearchParams(loc.search);
     const urlPath = query.get('path') || '/';
-    if (path !== urlPath) {
+    if (path !== urlPath && !loading) {
       setPath(urlPath);
       clearSearchString();
     }
