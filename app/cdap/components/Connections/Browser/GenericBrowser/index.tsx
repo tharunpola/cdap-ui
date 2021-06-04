@@ -29,6 +29,8 @@ import If from 'components/If';
 import EmptyMessageContainer from 'components/EmptyMessageContainer';
 import ErrorBanner from 'components/ErrorBanner';
 
+const PREFIX = 'features.DataPrep.DataPrepBrowser.GenericBrowser';
+
 const useStyle = makeStyle(() => {
   return {
     topBar: {
@@ -44,9 +46,6 @@ const useStyle = makeStyle(() => {
       display: 'flex',
       justifyContent: 'flex-end',
       marginRight: '8px',
-    },
-    alert: {
-      maxHeight: '4em',
     },
   };
 });
@@ -146,16 +145,16 @@ export function GenericBrowser({ selectedConnection }) {
         />
       </If>
       <If condition={isEmpty && !loading}>
-        <EmptyMessageContainer title="No entities available">
+        <EmptyMessageContainer title={T.translate(`${PREFIX}.EmptyMessageContainer.title`)}>
           <ul>
             <li>
               <span className="link-text" onClick={clearSearchString}>
                 {T.translate(`features.EmptyMessageContainer.clearLabel`)}
               </span>
-              <span>your search</span>
+              <span>{T.translate(`${PREFIX}.EmptyMessageContainer.suggestion1`)}</span>
             </li>
             <li>
-              <span>Browse to another location</span>
+              <span>{T.translate(`${PREFIX}.EmptyMessageContainer.suggestion2`)}</span>
             </li>
           </ul>
         </EmptyMessageContainer>
