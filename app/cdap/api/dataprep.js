@@ -36,6 +36,7 @@ const MyDataPrepApi = {
   execute: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepathV2}/execute`),
   summary: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepath}/summary`),
   getSchema: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepath}/schema`),
+  getSpecification: apiCreator(dataSrc, 'GET', 'REQUEST', `${basepathV2}/specification`),
   getUsage: apiCreator(dataSrc, 'GET', 'REQUEST', `${contextPath}/usage`),
   getInfo: apiCreator(dataSrc, 'GET', 'REQUEST', `${baseServicePath}/methods/info`),
   getWorkspace: apiCreator(dataSrc, 'GET', 'REQUEST', `${basepathV2}`),
@@ -64,19 +65,9 @@ const MyDataPrepApi = {
   createApp: apiCreator(dataSrc, 'PUT', 'REQUEST', `${appPath}`),
   ping: apiCreator(dataSrc, 'GET', 'REQUEST', `${baseServicePath}/methods/health`),
 
-  /**
-   * TODO: While integrating with v2 wrangler specification API do not remove the browser APIs.
-   * We have to think through the upgrade path for older "browse" button in pipelines.
-   */
   // File System Browser
   explorer: apiCreator(dataSrc, 'GET', 'REQUEST', `${contextPath}/explorer/fs`),
   readFile: apiCreator(dataSrc, 'GET', 'REQUEST', `${contextPath}/explorer/fs/read`),
-  getSpecification: apiCreator(
-    dataSrc,
-    'GET',
-    'REQUEST',
-    `${contextPath}/explorer/fs/specification`
-  ),
 
   // Database Browser
   listTables: apiCreator(dataSrc, 'GET', 'REQUEST', `${connectionsPath}/:connectionId/tables`),

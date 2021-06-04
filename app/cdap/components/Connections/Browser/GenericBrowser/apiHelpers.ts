@@ -39,8 +39,8 @@ export function createWorkspace({ entity, connection, limit = 1000 }) {
     connection,
     sampleRequest: {
       path,
-      properties: {},
-      limit: 1000,
+      properties: {}, // For 6.5 this will always be empty. Once we add support to set file encoding and other properties this will get dynamic.
+      limit,
     },
   };
   return DataprepApi.createWorkspace(

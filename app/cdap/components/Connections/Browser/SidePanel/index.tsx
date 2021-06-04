@@ -28,7 +28,6 @@ import { CreateConnectionBtn } from 'components/Connections/CreateConnectionBtn'
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import IconButton from '@material-ui/core/IconButton';
 import { getCurrentNamespace } from 'services/NamespaceStore';
-import { IConnectionMode } from 'components/Connections/ConnectionsContext';
 
 const useStyle = makeStyles<Theme>((theme) => {
   return {
