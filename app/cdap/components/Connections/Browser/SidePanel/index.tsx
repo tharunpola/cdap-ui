@@ -28,6 +28,7 @@ import { CreateConnectionBtn } from 'components/Connections/CreateConnectionBtn'
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import IconButton from '@material-ui/core/IconButton';
 import { getCurrentNamespace } from 'services/NamespaceStore';
+import { IConnectionMode } from 'components/Connections/ConnectionsContext';
 
 const useStyle = makeStyles<Theme>((theme) => {
   return {
@@ -53,14 +54,12 @@ interface IConnectionsBrowserSidePanelState {
 }
 
 interface IConnectionBrowserSidePanelProps {
-  enableRouting?: boolean;
   onSidePanelToggle: () => void;
   onConnectionSelection: (conn: string) => void;
   selectedConnection: string;
 }
 
 export function ConnectionsBrowserSidePanel({
-  enableRouting,
   onSidePanelToggle,
   onConnectionSelection,
   selectedConnection,
@@ -96,7 +95,7 @@ export function ConnectionsBrowserSidePanel({
         onConnectionSelection={onConnectionSelection}
         selectedConnection={selectedConnection}
       />
-      <CreateConnectionBtn enableRouting={true} />
+      <CreateConnectionBtn />
     </Paper>
   );
 }

@@ -30,6 +30,7 @@ import SearchField from 'components/Connections/Browser/GenericBrowser/SearchFie
 import { BrowserTable } from 'components/Connections/Browser/GenericBrowser/BrowserTable';
 import If from 'components/If';
 import { Redirect } from 'react-router';
+import { ConnectionsContext, IConnectionMode } from 'components/Connections/ConnectionsContext';
 
 const useStyle = makeStyle(() => {
   return {
@@ -65,6 +66,7 @@ export function GenericBrowser({ selectedConnection }) {
   const [searchStringDisplay, setSearchStringDisplay] = React.useState('');
   const [workspaceId, setWorkspaceId] = React.useState(null);
   const classes = useStyle();
+  const { onWorkspaceCreate } = React.useContext(ConnectionsContext);
 
   const fetchEntities = async () => {
     setLoading(true);
@@ -117,6 +119,9 @@ export function GenericBrowser({ selectedConnection }) {
         entity,
         connection: selectedConnection,
       });
+      if (onWorkspaceCreate) {
+        return onWorkspaceCreate(wid);
+      }
       setWorkspaceId(wid);
     } catch (e) {
       setError(e && e.message ? e.message : e);
