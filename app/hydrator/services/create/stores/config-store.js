@@ -112,10 +112,8 @@ class HydratorPlusPlusConfigStore {
         this.setMaxConcurrentRuns(this.state.config.maxConcurrentRuns);
       }
       this.setPushdownConfig({
-        // null: getDefaultConfig, undefined: imported json, {}: just in case
-        enabled: (this.state.config.transformationPushdown !== null
-          && this.state.config.transformationPushdown !== undefined
-          && !angular.equals(this.state.config.transformationPushdown, {})),
+        enabled: this.state.config.transformationPushdown !== null
+          && this.state.config.transformationPushdown !== undefined,
         transformationPushdown: this.state.config.transformationPushdown
       })
     }

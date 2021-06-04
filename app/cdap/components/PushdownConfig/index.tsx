@@ -87,8 +87,18 @@ function fetchPluginInfo() {
 }
 interface IPushdownConfig {
   enabled: boolean;
-  transformationPushdown: null | {
-    plugin: null | object;
+  transformationPushdown?: {
+    plugin?: {
+      name: string;
+      label: string;
+      type: string;
+      artifact: {
+        name: string;
+        version: string;
+        scope: string;
+      };
+      properties: object;
+    };
   };
 }
 
@@ -104,18 +114,15 @@ export default function PushdownConfig({ value, onValueChange }: IPushdownProps)
   const pluginProperties = objectQuery(pluginInfo, 'properties') || {};
   const { enabled, transformationPushdown } = value;
 
-  const plugin = objectQuery(transformationPushdown, 'plugin');
-  const valueProperties = objectQuery(plugin, 'properties') || {};
+  const plugin = transformationPushdown?.plugin;
+  const valueProperties = plugin?.properties || {};
 
   const classes = useStyles();
-  const onChange = (newProps) => {
+  const onChange = (properties) => {
     const newTransformationPushdown = {
       plugin: {
         ...plugin,
-        properties: {
-          ...valueProperties,
-          ...newProps,
-        },
+        properties,
       },
     };
     onValueChange({ enabled, transformationPushdown: newTransformationPushdown });

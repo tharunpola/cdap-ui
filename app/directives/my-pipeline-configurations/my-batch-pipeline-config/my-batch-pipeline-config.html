@@ -206,11 +206,11 @@
           store="BatchPipelineConfigCtrl.store">
         </my-post-run-actions>
       </div>
-      <div class="configuration-step-content" id="pushdown-tab-content"
-        ng-if="BatchPipelineConfigCtrl.activeTab === 'pushdown'" style="height: 100%; width: 100%; display: block;">
+      <div class="configuration-step-content pushdown-config-full-block" id="pushdown-tab-content"
+        ng-if="BatchPipelineConfigCtrl.activeTab === 'pushdown'">
         <pushdown-config value="BatchPipelineConfigCtrl.pushdownConfig"
           on-value-change="BatchPipelineConfigCtrl.onPushdownConfigChange"
-          style="height: 100%; width: 100%; display: block;">
+          class="pushdown-config-full-block">
         </pushdown-config>
       </div>
 
