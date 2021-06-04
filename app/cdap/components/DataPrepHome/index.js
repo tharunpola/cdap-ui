@@ -175,7 +175,7 @@ export default class DataPrepHome extends Component {
         }
         let sortedWorkspace = orderBy(
           res.values,
-          [(workspace) => workspace.name.toLowerCase()],
+          [(workspace) => workspace.workspaceName.toLowerCase()],
           ['asc']
         );
         DataPrepStore.dispatch({
@@ -186,7 +186,7 @@ export default class DataPrepHome extends Component {
         });
 
         let isCurrentWorkspaceIdValid = sortedWorkspace.find(
-          (ws) => ws.id === this.props.match.params.workspaceId
+          (ws) => ws.workspaceId === this.props.match.params.workspaceId
         );
         if (this.props.match.params.workspaceId && !isCurrentWorkspaceIdValid) {
           let url = this.props.match.url.slice(
@@ -195,13 +195,13 @@ export default class DataPrepHome extends Component {
           );
           this.props.history.replace(url);
         } else {
-          setWorkspace(sortedWorkspace[0].id).subscribe();
+          setWorkspace(sortedWorkspace[0].workspaceId).subscribe();
         }
         this.setState({
-          rerouteTo: sortedWorkspace[0].id,
+          rerouteTo: sortedWorkspace[0].workspaceId,
           backendDown: false,
           backendCheck: false,
-          currentWorkspaceId: sortedWorkspace[0].id,
+          currentWorkspaceId: sortedWorkspace[0].workspaceId,
         });
         DataPrepStore.dispatch({
           type: DataPrepActions.disableLoading,

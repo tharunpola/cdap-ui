@@ -198,7 +198,7 @@ export default class DataPrepTopPanel extends Component {
 
   renderTopPanelDisplay() {
     let info = this.state.workspaceInfo;
-
+    // TODO - CDAP-18042: Currently this information is not shown temporarily.
     if (info) {
       if (info.properties.connection === 'file') {
         return (

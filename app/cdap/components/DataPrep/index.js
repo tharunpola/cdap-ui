@@ -31,7 +31,7 @@ import WorkspaceTabs from 'components/DataPrep/WorkspaceTabs';
 import IconSVG from 'components/IconSVG';
 import classnames from 'classnames';
 import { checkDataPrepHigherVersion } from 'components/DataPrep/helper';
-import { isNilOrEmpty } from 'services/helpers';
+import { isNilOrEmpty, isNilOrEmptyString } from 'services/helpers';
 import LoadingSVGCentered from 'components/LoadingSVGCentered';
 import T from 'i18n-react';
 import isEmpty from 'lodash/isEmpty';
@@ -181,6 +181,9 @@ export default class DataPrep extends Component {
   }
 
   setCurrentWorkspace(workspaceId) {
+    if (isNilOrEmptyString(workspaceId)) {
+      return;
+    }
     setWorkspace(workspaceId).subscribe(
       () => {
         let { properties } = DataPrepStore.getState().dataprep;
