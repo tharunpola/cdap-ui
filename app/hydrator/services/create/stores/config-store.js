@@ -112,8 +112,7 @@ class HydratorPlusPlusConfigStore {
         this.setMaxConcurrentRuns(this.state.config.maxConcurrentRuns);
       }
       this.setPushdownConfig({
-        enabled: this.state.config.transformationPushdown !== null
-          && this.state.config.transformationPushdown !== undefined,
+        enabled: !!this.state.config.transformationPushdown,
         transformationPushdown: this.state.config.transformationPushdown
       })
     }
