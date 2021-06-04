@@ -144,7 +144,7 @@ export default class DataPrep extends Component {
   checkBackendUp() {
     // On single workspace mode (within pipeline), the service management is
     // handled from the wrapper component (DataPrepHome)
-    if (!this.props.singleWorkspaceMode) {
+    if (!this.props.mode === 'ROUTED_WORKSPACE') {
       this.init(this.props);
       return;
     }
@@ -166,7 +166,7 @@ export default class DataPrep extends Component {
   init(props) {
     const workspaceId = props.workspaceId;
 
-    if (props.singleWorkspaceMode) {
+    if (props.mode === 'ROUTED_WORKSPACE') {
       DataPrepStore.dispatch({
         type: DataPrepActions.setWorkspaceMode,
         payload: {
@@ -241,7 +241,7 @@ export default class DataPrep extends Component {
   }
 
   renderTabs() {
-    if (this.props.singleWorkspaceMode) {
+    if (this.props.mode === 'ROUTED_WORKSPACE') {
       return null;
     }
 
@@ -304,10 +304,10 @@ export default class DataPrep extends Component {
     return (
       <div
         className={classnames('dataprep-container', {
-          'single-workspace': this.props.singleWorkspaceMode,
+          'single-workspace': this.props.mode === 'ROUTED_WORKSPACE',
         })}
       >
-        {this.props.singleWorkspaceMode ? null : (
+        {this.props.mode === 'ROUTED_WORKSPACE' ? null : (
           <Helmet
             title={T.translate(`${DATAPREP_I18N_PREFIX}.pageTitle`, {
               workspaceUri: !isNilOrEmpty(this.state.workspaceName)
@@ -326,7 +326,7 @@ export default class DataPrep extends Component {
           <div className="top-section-content float-left">
             {this.renderTabs()}
             <DataPrepTopPanel
-              singleWorkspaceMode={this.props.singleWorkspaceMode}
+              mode={this.props.mode}
               onSubmit={this.onSubmitToListener.bind(this)}
               disabled={this.props.disabled}
             />
@@ -345,7 +345,7 @@ export default class DataPrep extends Component {
   }
 }
 DataPrep.propTypes = {
-  singleWorkspaceMode: PropTypes.bool,
+  mode: PropTypes.oneOf(['ROUTED', 'ROUTED_WORKSPACE', 'INMEMORY']),
   workspaceId: PropTypes.string,
   onSubmit: PropTypes.func,
   onConnectionsToggle: PropTypes.func.isRequired,
