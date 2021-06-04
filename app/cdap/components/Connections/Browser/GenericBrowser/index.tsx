@@ -84,6 +84,7 @@ export function GenericBrowser({ selectedConnection }) {
       setError(null);
     } catch (e) {
       setError(`Failed to explore connection : "${e.response}"`);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
@@ -142,15 +143,17 @@ export function GenericBrowser({ selectedConnection }) {
           />
         </div>
         <div className={classes.topBarSearch}>
-          <div className={classes.entityCount}>
-            <EntityCount
-              entityCounts={entityCounts}
-              isFiltered={lowerSearchString.length}
-              isTruncated={entities.length < totalCount}
-              totalUnfilteredCount={entities.length}
-              truncationLimit={entities.length}
-            />
-          </div>
+          <If condition={totalCount > 0}>
+            <div className={classes.entityCount}>
+              <EntityCount
+                entityCounts={entityCounts}
+                isFiltered={lowerSearchString.length}
+                isTruncated={entities.length < totalCount}
+                totalUnfilteredCount={entities.length}
+                truncationLimit={entities.length}
+              />
+            </div>
+          </If>
           <SearchField onChange={handleSearchChange} value={searchStringDisplay} />
         </div>
       </div>
