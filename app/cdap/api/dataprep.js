@@ -32,8 +32,8 @@ const datamodelsPath = `${contextPath}/datamodels/schemas`;
 const MyDataPrepApi = {
   createWorkspace: apiCreator(dataSrc, 'POST', 'REQUEST', `${contextPathV2}/workspaces`),
 
-  delete: apiCreator(dataSrc, 'DELETE', 'REQUEST', basepath),
-  execute: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepath}/execute`),
+  delete: apiCreator(dataSrc, 'DELETE', 'REQUEST', basepathV2),
+  execute: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepathV2}/execute`),
   summary: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepath}/summary`),
   getSchema: apiCreator(dataSrc, 'POST', 'REQUEST', `${basepath}/schema`),
   getUsage: apiCreator(dataSrc, 'GET', 'REQUEST', `${contextPath}/usage`),
