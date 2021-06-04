@@ -38,6 +38,7 @@ const useStyle = makeStyles<Theme>((theme) => {
       backgroundColor: theme.palette.grey[600],
       paddingBottom: `${theme.spacing(1)}px`,
       overflowY: 'auto',
+      overflowX: 'hidden',
     },
     toggleContainer: {
       padding: `${theme.spacing(2)}px ${theme.spacing(1)}px`,
@@ -66,6 +67,7 @@ export function ConnectionsBrowserSidePanel({
   selectedConnection,
 }: IConnectionBrowserSidePanelProps) {
   const classes = useStyle();
+  const boundaryElement = React.useRef(null);
   const [state, setState] = React.useState<IConnectionsBrowserSidePanelState>({
     categorizedConnections: new Map(),
     categories: [],
@@ -83,7 +85,7 @@ export function ConnectionsBrowserSidePanel({
     initState();
   }, []);
   return (
-    <Paper className={classes.root}>
+    <Paper className={classes.root} ref={boundaryElement}>
       <div className={classes.toggleContainer} onClick={onSidePanelToggle}>
         <IconButton size="small">
           <ArrowBackIosIcon fontSize="inherit" />
@@ -95,6 +97,8 @@ export function ConnectionsBrowserSidePanel({
         categorizedConnections={state.categorizedConnections}
         onConnectionSelection={onConnectionSelection}
         selectedConnection={selectedConnection}
+        boundaryElement={boundaryElement}
+        fetchConnections={initState}
       />
       <CreateConnectionBtn enableRouting={true} />
     </Paper>
